@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="profile-section">
+            <div class="profile-icon">👤</div>
+            <div class="profile-info">
+                <p class="welcome">Welcome,</p>
+                <p class="username" id="profileName">User</p>
+            </div>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item active" onclick="showSection('dashboard')">
+                <span class="icon">📊</span>
+                <span class="label">Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="showSection('employees')">
+                <span class="icon">👥</span>
+                <span class="label">Employees</span>
+            </div>
+            <div class="nav-item" onclick="showSection('attendance')">
+                <span class="icon">📅</span>
+                <span class="label">Attendance</span>
+            </div>
+            <div class="nav-item" onclick="showSection('payroll')">
+                <span class="icon">💰</span>
+                <span class="label">Payroll</span>
+            </div>
+            <div class="nav-item" onclick="showSection('leaves')">
+                <span class="icon">🏖️</span>
+                <span class="label">Leave Mgmt</span>
+            </div>
+        </nav>
+
+        <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <h1>Dashboard</h1>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total Employees</h3>
+                    <p class="stat-value" id="totalEmployees">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Present Today</h3>
+                    <p class="stat-value" id="presentToday">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending Payroll</h3>
+                    <p class="stat-value" id="pendingPayroll">0</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h2>Attendance Overview</h2>
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Employees Section -->
+        <section id="employees" class="content-section">
+            <div class="section-header">
+                <h1>Employee Database</h1>
+                <button class="btn-primary" onclick="openAddEmployeeModal()" id="addEmpBtn">+ Add New Employee</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Emp ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>DOB</th>
+                            <th>DOJ</th>
+                            <th>Address</th>
+                            <th>Dept</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Attendance Section -->
+        <section id="attendance" class="content-section">
+            <div class="section-header">
+                <h1>Attendance</h1>
+                <div class="attendance-controls">
+                    <input type="date" id="attendanceDate" value="">
+                    <button class="btn-primary" onclick="markAttendance()">Mark Attendance</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Emp ID</th>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Attendance data here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Leave Management Section -->
+        <section id="leaves" class="content-section">
+            <div class="section-header">
+                <h1>Leave</h1>
+                <button class="btn-primary" onclick="openRequestLeaveModal()" id="requestLeaveBtn">+ Request Leave</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Emp ID</th>
+                            <th>Name</th>
+                            <th>Leave Type</th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Days</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaveTableBody">
+                        <!-- Leave data here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Payroll Section -->
+        <section id="payroll" class="content-section">
+            <div class="section-header">
+                <h1>Payroll Management</h1>
+                <button class="btn-primary" onclick="processPayroll()" id="payrollBtn">Process Payroll</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Emp ID</th>
+                            <th>Name</th>
+                            <th>Salary</th>
+                            <th>Days Worked</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payrollTableBody">
+                        <!-- Payroll data here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Request Leave Modal -->
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRequestLeaveModal()">&times;</span>
+            <h2>Request Leave</h2>
+            <form onsubmit="saveLeaveRequest(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Employee</label>
+                        <select id="leaveEmpId" required>
+                            <option value="">Select Employee</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Leave Type</label>
+                        <select id="leaveType" required>
+                            <option value="">Select Leave Type</option>
+                            <option value="Sick Leave">Sick Leave</option>
+                            <option value="Casual Leave">Casual Leave</option>
+                            <option value="Annual Leave">Annual Leave</option>
+                            <option value="Maternity Leave">Maternity Leave</option>
+                            <option value="Unpaid Leave">Unpaid Leave</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>From Date</label>
+                        <input type="date" id="leaveFromDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>To Date</label>
+                        <input type="date" id="leaveToDate" required>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Reason</label>
+                    <textarea id="leaveReason" placeholder="Enter reason for leave" style="min-height: 80px; resize: vertical;"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Submit Request</button>
+                    <button type="button" class="btn-secondary" onclick="closeRequestLeaveModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddEmployeeModal()">&times;</span>
+            <h2>Add/Edit Employee</h2>
+            <form onsubmit="saveEmployee(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Employee ID</label>
+                        <input type="text" id="empId" placeholder="Auto-generated" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="empName" placeholder="Enter name" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="empEmail" placeholder="Enter email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="empPhone" placeholder="Enter phone number" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" id="empDOB" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Joining</label>
+                        <input type="date" id="empDOJ" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>Department</label>
+                        <select id="empDept" required>
+                            <option value="">Select Department</option>
+                            <option value="HR">HR</option>
+                            <option value="IT">IT</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Operations">Operations</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Address</label>
+                    <input type="text" id="empAddress" placeholder="Enter address" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Monthly Salary</label>
+                    <input type="number" id="empSalary" placeholder="Enter salary" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Employee</button>
+                    <button type="button" class="btn-secondary" onclick="closeAddEmployeeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
